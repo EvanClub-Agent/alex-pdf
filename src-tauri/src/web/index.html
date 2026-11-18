@@ -1,0 +1,2324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>AlexPDF · Web 控制台</title>
+<style>
+  /* Google Gemini / Material 3 design system — matches desktop UI */
+  :root {
+    color-scheme: light dark;
+    --brand-primary: light-dark(#0b57d0, #a8c7fa);
+    --brand-hover: light-dark(#0842a0, #c2d7fc);
+    --brand-pressed: light-dark(#062e6f, #d3e3fd);
+    --brand-on: light-dark(#ffffff, #062e6f);
+    --brand-tint-40: light-dark(#e8f0fe, #1b3052);
+    --brand-tint-30: light-dark(#d3e3fd, #004a77);
+    --brand-tint-20: light-dark(#a8c7fa, #00639b);
+
+    --grey-2:  light-dark(#f8fafd, #1b1c1d);
+    --grey-4:  light-dark(#ffffff, #131314);
+    --grey-8:  light-dark(#f0f4f9, #1e1f20);
+    --grey-16: light-dark(#e3e8ef, #2c2e30);
+    --grey-20: light-dark(#dde3ea, #333538);
+    --grey-30: light-dark(#c4c7c5, #444746);
+    --grey-60: light-dark(#747775, #8e918f);
+    --grey-90: light-dark(#444746, #c4c7c5);
+    --grey-130: light-dark(#1f1f1f, #e3e3e3);
+    --grey-160: light-dark(#1f1f1f, #e3e3e3);
+    --white: light-dark(#f8fafd, #1e1f20);
+
+    --success: light-dark(#146c2e, #6dd58c);
+    --success-bg: light-dark(#e6f4ea, #0f381e);
+    --warning: light-dark(#b06000, #ffb951);
+    --warning-bg: light-dark(#fef7e0, #3b2605);
+    --danger: light-dark(#b3261e, #f2b8b5);
+    --danger-bg: light-dark(#fce8e6, #491817);
+
+    --radius-sm: 999px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+    --transition: 0.16s cubic-bezier(0.2, 0, 0, 1);
+
+    /* legacy aliases used inline in markup */
+    --bg-input: var(--grey-8);
+    --border: var(--grey-16);
+    --text: var(--grey-160);
+    --text-muted: var(--grey-90);
+    --radius: var(--radius-lg);
+  }
+
+  body {
+    font-family: "Google Sans", "PingFang SC", "Segoe UI", "Microsoft YaHei UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--grey-4);
+    color: var(--grey-160);
+    line-height: 1.55;
+    min-height: 100vh;
+    margin: 0;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container { max-width: 1040px; margin: 0 auto; padding: 20px 32px 48px; }
+
+  /* Header — Gemini gradient greeting style */
+  .header {
+    background: transparent;
+    padding: 12px 0 20px;
+    margin: 0;
+    text-align: left;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #4285f4 0%, #9b72cb 52%, #d96570 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    width: fit-content;
+    letter-spacing: -0.3px;
+    margin: 0;
+  }
+  .header p { color: var(--grey-90); margin: 4px 0 0; font-size: 14px; }
+
+  /* Tabs — Gemini pill navigation */
+  .tabs {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    background: var(--grey-8);
+    padding: 5px;
+    border-radius: 999px;
+    border: 1px solid var(--grey-16);
+  }
+  .tab {
+    padding: 7px 16px;
+    background: transparent;
+    border: none;
+    color: var(--grey-90);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: var(--transition);
+    border-radius: 999px;
+  }
+  .tab:hover { color: var(--grey-160); background: var(--grey-20); }
+  .tab.active {
+    color: light-dark(#041e49, #c2e7ff);
+    background: var(--brand-tint-30);
+    font-weight: 600;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Card — Gemini rounded container surface */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--grey-16);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: var(--grey-160);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--grey-16);
+  }
+
+  /* Status grid — flat tiles */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .status-item {
+    background: var(--grey-2);
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--grey-16);
+    transition: var(--transition);
+  }
+  .status-item:hover { border-color: var(--grey-30); background: var(--white); }
+  .status-item .label {
+    font-size: 12px;
+    color: var(--grey-90);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 600;
+  }
+  .status-item .value { font-size: 15px; font-weight: 600; color: var(--grey-160); }
+  .status-item .value.ok { color: var(--success); }
+  .status-item .value.err { color: var(--danger); }
+
+  /* Form fields */
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--grey-130);
+    margin-bottom: 6px;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="file"],
+  .form-group input[type="url"],
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    height: 32px;
+    padding: 0 12px;
+    background: var(--white);
+    border: 1px solid var(--grey-30);
+    border-radius: var(--radius-sm);
+    color: var(--grey-160);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: var(--transition);
+  }
+  .form-group textarea {
+    height: auto;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+  .form-group input:hover,
+  .form-group select:hover,
+  .form-group textarea:hover { border-color: var(--grey-60); }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 1px var(--brand-primary);
+  }
+  .form-group input[type="file"] { padding: 4px; height: auto; }
+  .form-group input[type="file"]::file-selector-button {
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--grey-30);
+    background: var(--white);
+    color: var(--grey-130);
+    cursor: pointer;
+    margin-right: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: var(--transition);
+  }
+  .form-group input[type="file"]::file-selector-button:hover {
+    background: var(--grey-4);
+    border-color: var(--grey-60);
+  }
+  .form-group .hint { font-size: 12px; color: var(--grey-90); margin-top: 4px; }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand-primary);
+    cursor: pointer;
+  }
+  .checkbox-row label { font-size: 14px; color: var(--grey-130); cursor: pointer; user-select: none; }
+
+  /* Buttons — Fluent flat style */
+  .btn {
+    padding: 0 16px;
+    height: 32px;
+    border: 1px solid var(--brand-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    background: var(--brand-primary);
+    color: var(--brand-on);
+    white-space: nowrap;
+  }
+  .btn:hover:not(:disabled) {
+    background: var(--brand-hover);
+    border-color: var(--brand-hover);
+  }
+  .btn:active:not(:disabled) {
+    background: var(--brand-pressed);
+    border-color: var(--brand-pressed);
+  }
+  .btn:disabled {
+    background: var(--grey-8);
+    border-color: var(--grey-20);
+    color: var(--grey-60);
+    cursor: not-allowed;
+  }
+  .btn-primary { /* default */ }
+  .btn-success { background: var(--success); border-color: var(--success); color: light-dark(#ffffff, #072711); }
+  .btn-success:hover:not(:disabled) { opacity: 0.9; }
+  .btn-danger { background: var(--danger); border-color: var(--danger); color: light-dark(#ffffff, #310b09); }
+  .btn-danger:hover:not(:disabled) { opacity: 0.9; }
+  .btn-outline {
+    background: var(--white);
+    border-color: var(--grey-30);
+    color: var(--grey-130);
+  }
+  .btn-outline:hover:not(:disabled) {
+    background: var(--grey-8);
+    border-color: var(--grey-60);
+    color: var(--grey-160);
+  }
+  .btn-sm { padding: 0 12px; height: 28px; font-size: 13px; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* Result box & code — dark code surface like desktop LogPanel */
+  .result-box {
+    color-scheme: dark;
+    background: #161719;
+    border: 1px solid #2c2e30;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-top: 16px;
+    max-height: 400px;
+    overflow: auto;
+    font-family: "Cascadia Mono", "Cascadia Code", "Consolas", "Fira Code", monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #d4d7dd;
+  }
+
+  /* PDF preview */
+  .preview-frame {
+    width: 100%;
+    height: 640px;
+    border: 1px solid var(--grey-16);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+  }
+  .preview-placeholder {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--grey-30);
+    border-radius: var(--radius-md);
+    color: var(--grey-90);
+    font-size: 14px;
+    background: var(--grey-2);
+  }
+
+  /* API 文档 */
+  .api-section {
+    margin-bottom: 16px;
+    border: 1px solid var(--grey-16);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    background: var(--grey-2);
+  }
+  .api-section h4 {
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--grey-160);
+  }
+  .method {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-on);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    line-height: 16px;
+    height: 20px;
+  }
+  .method.get { background: var(--success); color: light-dark(#ffffff, #072711); }
+  .method.post { background: var(--brand-primary); }
+  .api-path {
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    color: var(--grey-160);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .api-desc { color: var(--grey-90); font-size: 13px; margin-bottom: 8px; }
+  .api-code {
+    color-scheme: dark;
+    background: #161719;
+    border: 1px solid #2c2e30;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: 12px;
+    white-space: pre;
+    overflow-x: auto;
+    margin-top: 8px;
+    color: #d4d7dd;
+    line-height: 1.6;
+  }
+  .api-toggle {
+    background: transparent;
+    border: 1px solid var(--grey-30);
+    color: var(--brand-primary);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    font-family: inherit;
+  }
+  .api-toggle:hover {
+    background: var(--brand-tint-40);
+    border-color: var(--brand-primary);
+  }
+  .api-detail { display: none; margin-top: 12px; }
+  .api-detail.open { display: block; }
+  .api-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+    margin-top: 8px;
+    border: 1px solid var(--grey-16);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--white);
+  }
+  .api-table th,
+  .api-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--grey-16);
+    text-align: left;
+    vertical-align: top;
+  }
+  .api-table tr:last-child th,
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-table th {
+    background: var(--grey-4);
+    color: var(--grey-130);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .api-table td { color: var(--grey-130); }
+  .api-table code {
+    background: var(--grey-8);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    color: var(--brand-primary);
+  }
+  .api-examples {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--grey-16);
+  }
+  .api-examples-title {
+    font-size: 13px;
+    color: var(--grey-130);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .code-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--grey-16);
+  }
+  .code-tab {
+    padding: 6px 12px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--grey-90);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    margin-bottom: -1px;
+    font-family: inherit;
+  }
+  .code-tab:hover { color: var(--brand-primary); }
+  .code-tab.active {
+    color: var(--brand-primary);
+    border-bottom-color: var(--brand-primary);
+  }
+  .code-panel { display: none; }
+  .code-panel.active { display: block; }
+
+  /* Progress bar */
+  .progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background: var(--grey-8);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--brand-primary);
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* File results */
+  .file-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--white);
+    border: 1px solid var(--grey-16);
+    border-radius: var(--radius-md);
+    margin-bottom: 6px;
+    transition: var(--transition);
+  }
+  .file-result:hover { background: var(--grey-2); border-color: var(--grey-30); }
+  .file-result .name { font-size: 14px; font-weight: 500; color: var(--grey-160); }
+  .file-result .status-badge {
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid transparent;
+  }
+  .file-result .status-badge.success {
+    background: var(--success-bg);
+    color: var(--success);
+    border-color: rgba(16,124,65,0.25);
+  }
+  .file-result .status-badge.failed {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border-color: rgba(164,38,44,0.25);
+  }
+
+  /* Inline code/pill in API copy */
+  code {
+    background: var(--grey-8);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    color: var(--brand-primary);
+  }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--grey-20); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--grey-30); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>AlexPDF</h1>
+    <p>Web 控制台 · 接口调试 · PDF 预览</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('status')">服务状态</button>
+    <button class="tab" onclick="switchTab('convert')">文件转换</button>
+    <button class="tab" onclick="switchTab('batch')">批量转换</button>
+    <button class="tab" onclick="switchTab('task')">任务查询</button>
+    <button class="tab" onclick="switchTab('preview')">PDF 预览</button>
+    <button class="tab" onclick="switchTab('docs')">接口文档</button>
+  </div>
+
+  <!-- ==================== 服务状态 ==================== -->
+  <div id="panel-status" class="panel active">
+    <div class="card">
+      <h3>服务健康检查</h3>
+      <div class="btn-row" style="margin-bottom: 16px;">
+        <button class="btn btn-primary" onclick="loadHealth()">刷新状态</button>
+        <button class="btn btn-outline" onclick="loadWps()">检测 WPS</button>
+        <button class="btn btn-outline" onclick="loadSettings()">获取设置</button>
+        <button class="btn btn-outline" onclick="loadUpdate()">检查更新</button>
+      </div>
+      <div id="status-grid" class="status-grid">
+        <div class="status-item"><div class="label">服务状态</div><div class="value" id="st-status">-</div></div>
+        <div class="status-item"><div class="label">版本</div><div class="value" id="st-version">-</div></div>
+        <div class="status-item"><div class="label">WPS 可用</div><div class="value" id="st-wps">-</div></div>
+        <div class="status-item"><div class="label">WPS ProgID</div><div class="value" id="st-progid">-</div></div>
+        <div class="status-item"><div class="label">WPS 版本</div><div class="value" id="st-wps-ver">-</div></div>
+        <div class="status-item"><div class="label">默认输出目录</div><div class="value" id="st-output" style="font-size:13px;word-break:break-all;">-</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>原始响应</h3>
+      <div class="result-box" id="status-raw">点击上方按钮查看接口返回数据</div>
+    </div>
+  </div>
+
+  <!-- ==================== 单文件转换 ==================== -->
+  <div id="panel-convert" class="panel">
+    <div class="card">
+      <h3>单文件转换</h3>
+      <div class="form-group">
+        <label>选择文件 (doc/docx/xls/xlsx)</label>
+        <input type="file" id="single-file" accept=".doc,.docx,.xls,.xlsx">
+      </div>
+      <div class="form-group">
+        <label>输出文件名（可选）</label>
+        <input type="text" id="single-output-name" placeholder="留空则使用源文件名">
+      </div>
+      <div class="form-group">
+        <label>文档下载链接（可选）</label>
+        <input type="text" id="single-url" placeholder="填写后优先从 URL 下载再转换">
+        <div class="hint">支持 .doc / .docx / .xls / .xlsx 下载链接</div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="single-async">
+        <label for="single-async">异步模式（立即返回 task_id，后续轮询结果）</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="convertSingle()" id="btn-convert-single">开始转换</button>
+      </div>
+      <div class="result-box" id="single-result" style="display:none;"></div>
+      <div id="single-preview-actions" style="margin-top:12px; display:none;">
+        <button class="btn btn-success btn-sm" onclick="previewFromSingle()">预览 PDF</button>
+        <button class="btn btn-outline btn-sm" onclick="pollFromSingle()">查询任务状态</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 批量转换 ==================== -->
+  <div id="panel-batch" class="panel">
+    <div class="card">
+      <h3>批量转换</h3>
+      <div class="form-group">
+        <label>选择多个文件（同类型: 全部 Word 或全部 Excel）</label>
+        <input type="file" id="batch-files" accept=".doc,.docx,.xls,.xlsx" multiple>
+      </div>
+      <div class="form-group">
+        <label>输出目录（可选，绝对路径）</label>
+        <input type="text" id="batch-output-folder" placeholder="留空则使用默认输出目录">
+      </div>
+      <div class="form-group">
+        <label>文档下载链接（可选，每行一个）</label>
+        <textarea id="batch-urls" rows="5" placeholder="填写后优先从 URL 批量下载再转换"></textarea>
+        <div class="hint">支持多个 .doc / .docx / .xls / .xlsx 下载链接，且仍不支持混合 Word/Excel 类型</div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="batch-async">
+        <label for="batch-async">异步模式</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="convertBatch()" id="btn-convert-batch">开始批量转换</button>
+      </div>
+      <div class="result-box" id="batch-result" style="display:none;"></div>
+      <div id="batch-file-results" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 任务查询 ==================== -->
+  <div id="panel-task" class="panel">
+    <div class="card">
+      <h3>任务状态查询</h3>
+      <div class="form-group">
+        <label>Task ID (UUID)</label>
+        <input type="text" id="task-id-input" placeholder="输入转换任务返回的 task_id">
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="task-auto-poll">
+        <label for="task-auto-poll">自动轮询（每秒刷新直到完成）</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="queryTask()">查询</button>
+        <button class="btn btn-outline" onclick="stopPolling()">停止轮询</button>
+      </div>
+      <div id="task-progress" style="margin-top:16px; display:none;">
+        <div style="display:flex; justify-content:space-between; font-size:14px;">
+          <span id="task-progress-label">进度</span>
+          <span id="task-progress-pct">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="task-progress-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="result-box" id="task-result" style="display:none;"></div>
+      <div id="task-file-results" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== PDF 预览 ==================== -->
+  <div id="panel-preview" class="panel">
+    <div class="card">
+      <h3>PDF 预览</h3>
+      <div class="form-group">
+        <label>PDF 文件绝对路径</label>
+        <input type="text" id="preview-path" placeholder="例如: C:\Users\xxx\output\document.pdf">
+      </div>
+      <div class="btn-row" style="margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="previewPdf()">加载预览</button>
+      </div>
+      <div id="preview-container">
+        <div class="preview-placeholder" id="preview-placeholder">选择或输入 PDF 路径后点击预览</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 接口文档 ==================== -->
+  <div id="panel-docs" class="panel">
+    <div class="card">
+      <h3>接口文档</h3>
+      <p style="color:var(--text-muted); margin-bottom:16px; font-size:14px;">
+        所有接口基地址: <code style="background:var(--bg-input); padding:2px 8px; border-radius:4px;">http://127.0.0.1:24568</code>
+        &nbsp; 最大单文件: 50MB &nbsp; 最大请求体: 120MB
+      </p>
+
+      <!-- GET /health -->
+      <div class="api-section">
+        <h4><span class="method get">GET</span> <span class="api-path">/health</span></h4>
+        <div class="api-desc">健康检查，返回服务状态和 WPS 可用性</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">请求参数：无</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">响应体：</p>
+          <div class="api-code">{
+  "status": "ok",                    // 服务状态
+  "version": "1.0.0",               // 应用版本
+  "wps_available": true,             // WPS 是否可用
+  "wps_prog_id": "KWPS.Application" // WPS ProgID，不可用时为 null
+}</div>
+          <div class="api-examples" data-example-key="health"></div>
+        </div>
+      </div>
+
+      <!-- GET /api/settings -->
+      <div class="api-section">
+        <h4><span class="method get">GET</span> <span class="api-path">/api/settings</span></h4>
+        <div class="api-desc">获取应用设置</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">请求参数：无</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">响应体：</p>
+          <div class="api-code">{
+  "default_output_dir": "C:\\Users\\xxx\\output"  // 默认输出目录，可能为 null
+}</div>
+          <div class="api-examples" data-example-key="settings"></div>
+        </div>
+      </div>
+
+      <!-- GET /api/check-wps -->
+      <div class="api-section">
+        <h4><span class="method get">GET</span> <span class="api-path">/api/check-wps</span></h4>
+        <div class="api-desc">检测本机已安装的转换引擎 (WPS / Microsoft Office)</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">请求参数：无</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">响应体：</p>
+          <div class="api-code">{
+  "available": true,                       // 当前引擎是否可用
+  "version": "12.1.0.16417",              // 当前引擎版本号，不可用时为 null
+  "error": null,                           // 错误信息，正常时为 null
+  "engine": "auto",                        // 当前选择的引擎: auto / wps / office
+  "engines": [
+    { "engine": "wps",    "available": true,  "version": "12.1.0.16417", "error": null },
+    { "engine": "office", "available": true,  "version": "16.0.17000",   "error": null }
+  ]
+}</div>
+          <div class="api-examples" data-example-key="check-wps"></div>
+        </div>
+      </div>
+
+      <!-- POST /api/convert -->
+      <div class="api-section">
+        <h4><span class="method post">POST</span> <span class="api-path">/api/convert</span></h4>
+        <div class="api-desc">单文件转换为 PDF</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">Query 参数：</p>
+          <table class="api-table">
+            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>async</td><td>boolean</td><td>否</td><td>是否异步模式，默认 false</td></tr>
+            <tr><td>response</td><td>string</td><td>否</td><td>可选 <code>json</code> 或 <code>file</code>，当为 <code>file</code> 时同步返回 PDF 二进制流</td></tr>
+            <tr><td>engine</td><td>string</td><td>否</td><td>本次使用的引擎: <code>auto</code> / <code>wps</code> / <code>office</code>。省略则使用桌面端设置中的全局引擎</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">请求体：<code>multipart/form-data</code></p>
+          <table class="api-table">
+            <tr><th>字段名</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>file</td><td>File</td><td>是</td><td>要转换的文件 (.doc/.docx/.xls/.xlsx)</td></tr>
+            <tr><td>output_name</td><td>string</td><td>否</td><td>自定义输出文件名</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">同步模式响应体：</p>
+          <div class="api-code">{
+  "success": true,
+  "task_id": "uuid-string",
+  "input_file": "document.docx",
+  "output_file": "C:\\...\\document.pdf",  // 异步模式为 null
+  "file_size": 123456,                     // 字节数，异步模式为 null
+  "duration_ms": 2500,                     // 耗时毫秒，异步模式为 null
+  "message": "转换成功",
+  "error": null
+}</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">错误响应体：</p>
+          <div class="api-code">{
+  "success": false,
+  "message": "错误描述"
+}</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">当 <code>response=file</code> 时：</p>
+          <div class="api-code">Content-Type: application/pdf
+Content-Disposition: attachment; filename="document.pdf"
+
+(PDF 二进制数据)</div>
+          <div class="api-examples" data-example-key="convert-single"></div>
+        </div>
+      </div>
+
+      <!-- POST /api/convert-batch -->
+      <div class="api-section">
+        <h4><span class="method post">POST</span> <span class="api-path">/api/convert-batch</span></h4>
+        <div class="api-desc">批量文件转换（同一类型: 全部 Word 或全部 Excel）</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">Query 参数：</p>
+          <table class="api-table">
+            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>async</td><td>boolean</td><td>否</td><td>是否异步模式，默认 false</td></tr>
+            <tr><td>response</td><td>string</td><td>否</td><td>可选 <code>json</code> 或 <code>file</code>，当为 <code>file</code> 时同步返回 PDF 二进制流</td></tr>
+            <tr><td>engine</td><td>string</td><td>否</td><td>本次使用的引擎: <code>auto</code> / <code>wps</code> / <code>office</code>。省略则使用桌面端设置中的全局引擎</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">请求体：<code>multipart/form-data</code></p>
+          <table class="api-table">
+            <tr><th>字段名</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>files 或 files[]</td><td>File (多个)</td><td>是</td><td>要转换的文件列表</td></tr>
+            <tr><td>output_folder</td><td>string</td><td>否</td><td>输出目录绝对路径</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">同步模式响应体：</p>
+          <div class="api-code">{
+  "success": true,
+  "task_id": "uuid-string",
+  "total": 3,
+  "succeeded": 3,
+  "failed": 0,
+  "duration_ms": null,
+  "results": [
+    {
+      "file": "doc1.docx",
+      "status": "success",        // "success" 或 "failed"
+      "output": "C:\\...\\doc1.pdf",
+      "size": 12345,
+      "duration_ms": 2000,
+      "error": null
+    }
+  ],
+  "message": "转换完成"
+}</div>
+          <div class="api-examples" data-example-key="convert-batch"></div>
+        </div>
+      </div>
+
+      <!-- POST /api/convert-from-url -->
+      <div class="api-section">
+        <h4><span class="method post">POST</span> <span class="api-path">/api/convert-from-url</span></h4>
+        <div class="api-desc">通过文档下载链接先下载，再转换为 PDF</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">Query 参数：</p>
+          <table class="api-table">
+            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>async</td><td>boolean</td><td>否</td><td>是否异步模式，默认 false</td></tr>
+            <tr><td>engine</td><td>string</td><td>否</td><td>本次使用的引擎: <code>auto</code> / <code>wps</code> / <code>office</code>。省略则使用桌面端设置中的全局引擎</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">请求体：<code>application/json</code></p>
+          <div class="api-code">{
+  "url": "https://example.com/demo.docx",
+  "output_name": "demo.pdf",        // 可选
+  "output_folder": "C:\\output"     // 可选，需绝对路径
+}</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">响应体：</p>
+          <div class="api-code">{
+  "success": true,
+  "task_id": "uuid-string",
+  "input_file": "demo.docx",
+  "output_file": "C:\\...\\demo.pdf",
+  "file_size": 123456,
+  "duration_ms": 2500,
+  "message": "下载并转换成功",
+  "error": null
+}</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">当 <code>response=file</code> 时：</p>
+          <div class="api-code">Content-Type: application/pdf
+Content-Disposition: attachment; filename="document.pdf"
+
+(PDF 二进制数据)</div>
+          <div class="api-examples" data-example-key="convert-from-url"></div>
+        </div>
+      </div>
+
+      <!-- POST /api/convert-batch-from-urls -->
+      <div class="api-section">
+        <h4><span class="method post">POST</span> <span class="api-path">/api/convert-batch-from-urls</span></h4>
+        <div class="api-desc">通过多个文档下载链接先批量下载，再批量转换 PDF</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">Query 参数：</p>
+          <table class="api-table">
+            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>async</td><td>boolean</td><td>否</td><td>是否异步模式，默认 false</td></tr>
+            <tr><td>engine</td><td>string</td><td>否</td><td>本次使用的引擎: <code>auto</code> / <code>wps</code> / <code>office</code>。省略则使用桌面端设置中的全局引擎</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">请求体：<code>application/json</code></p>
+          <div class="api-code">{
+  "urls": [
+    "https://example.com/a.docx",
+    "https://example.com/b.docx"
+  ],
+  "output_folder": "C:\\output"     // 可选，需绝对路径
+}</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">响应体：</p>
+          <div class="api-code">{
+  "success": true,
+  "task_id": "uuid-string",
+  "total": 2,
+  "succeeded": 2,
+  "failed": 0,
+  "duration_ms": null,
+  "results": [
+    {
+      "file": "a.docx",
+      "status": "success",
+      "output": "C:\\...\\a.pdf",
+      "size": 12345,
+      "duration_ms": 2000,
+      "error": null
+    }
+  ],
+  "message": "下载并批量转换完成"
+}</div>
+          <div class="api-examples" data-example-key="convert-batch-from-urls"></div>
+        </div>
+      </div>
+
+      <!-- GET /api/status/:task_id -->
+      <div class="api-section">
+        <h4><span class="method get">GET</span> <span class="api-path">/api/status/:task_id</span></h4>
+        <div class="api-desc">查询异步任务进度</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">路径参数：</p>
+          <table class="api-table">
+            <tr><th>参数</th><th>类型</th><th>说明</th></tr>
+            <tr><td>task_id</td><td>UUID string</td><td>转换任务返回的 task_id</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">响应体：</p>
+          <div class="api-code">{
+  "task_id": "uuid-string",
+  "status": "pending|processing|completed|failed",
+  "progress": 75,                    // 进度百分比 0-100
+  "current_file": "document.docx",   // 当前处理文件，可为 null
+  "total_files": 4,
+  "completed_files": 3,
+  "results": [                        // 完成后才有，处理中为 null
+    {
+      "file": "doc1.docx",
+      "status": "success",
+      "output": "C:\\...\\doc1.pdf",
+      "size": 12345,
+      "duration_ms": 2000,
+      "error": null
+    }
+  ],
+  "error": null,                      // 失败时的错误信息
+  "started_at": "2026-03-24T10:30:00+08:00"
+}</div>
+          <div class="api-examples" data-example-key="task-status"></div>
+        </div>
+      </div>
+
+      <!-- GET /api/preview -->
+      <div class="api-section">
+        <h4><span class="method get">GET</span> <span class="api-path">/api/preview</span></h4>
+        <div class="api-desc">预览转换后的 PDF 文件（返回 PDF 二进制流）</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">Query 参数：</p>
+          <table class="api-table">
+            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td>path</td><td>string</td><td>是</td><td>PDF 文件绝对路径（需 URL 编码）</td></tr>
+          </table>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">成功响应：</p>
+          <div class="api-code">Content-Type: application/pdf
+Content-Disposition: inline; filename="document.pdf"
+
+(PDF 二进制数据)</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">错误响应 (JSON)：</p>
+          <div class="api-code">{
+  "success": false,
+  "message": "无法读取文件: ..."
+}</div>
+          <div class="api-examples" data-example-key="preview"></div>
+        </div>
+      </div>
+
+      <!-- GET /api/update/check -->
+      <div class="api-section">
+        <h4><span class="method get">GET</span> <span class="api-path">/api/update/check</span></h4>
+        <div class="api-desc">检查版本更新</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">请求参数：无</p>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">响应体：</p>
+          <div class="api-code">{
+  "success": true,
+  "current_version": "1.0.0",
+  "latest_version": "1.1.0",        // 可为 null
+  "update_available": true,
+  "download_url": "http://...",      // 可为 null
+  "notes": "Bug fixes",             // 更新说明，可为 null
+  "pub_date": "2026-03-20",         // 发布日期，可为 null
+  "error": null
+}</div>
+          <div class="api-examples" data-example-key="update-check"></div>
+        </div>
+      </div>
+
+      <!-- POST /api/update/install -->
+      <div class="api-section">
+        <h4><span class="method post">POST</span> <span class="api-path">/api/update/install</span></h4>
+        <div class="api-desc">下载更新清单中的安装包。就绪后调用 /api/update/launch 启动安装。</div>
+        <button class="api-toggle" onclick="toggleDetail(this)">查看详情 ▼</button>
+        <div class="api-detail">
+          <p style="font-size:13px; color:var(--text-muted);">请求体：<code>application/json</code></p>
+          <div class="api-code">{
+  "url": "https://example.com/update.exe"  // 必须等于检查更新返回的 download_url
+}</div>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">响应体：</p>
+          <div class="api-code">{
+  "success": true,
+  "message": "已开始下载"
+}</div>
+          <div class="api-examples" data-example-key="update-install"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = window.location.origin;
+let pollTimer = null;
+let lastSingleResult = null;
+
+const CODE_LANGS = [
+  ['python', 'Python'],
+  ['java', 'Java'],
+  ['javascript', 'JavaScript'],
+  ['typescript', 'TypeScript'],
+  ['rust', 'Rust'],
+  ['go', 'Go'],
+];
+
+const API_EXAMPLES = {
+  health: {
+    python: String.raw`import requests
+
+base_url = "http://127.0.0.1:24568"
+resp = requests.get(f"{base_url}/health", timeout=10)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+HttpClient client = HttpClient.newHttpClient();
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/health"))
+    .GET()
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const baseUrl = "http://127.0.0.1:24568";
+
+const response = await fetch(baseUrl + "/health");
+if (!response.ok) throw new Error("request failed");
+
+const data = await response.json();
+console.log(data);`,
+    typescript: String.raw`type HealthResponse = {
+  status: string;
+  version: string;
+  wps_available: boolean;
+  wps_prog_id: string | null;
+};
+
+const response = await fetch("http://127.0.0.1:24568/health");
+if (!response.ok) throw new Error("request failed");
+
+const data: HealthResponse = await response.json();
+console.log(data.status, data.version);`,
+    rust: String.raw`fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data: serde_json::Value =
+        reqwest::blocking::get("http://127.0.0.1:24568/health")?.json()?;
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+func main() {
+	resp, err := http.Get("http://127.0.0.1:24568/health")
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	var data map[string]any
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		panic(err)
+	}
+
+	fmt.Println(data)
+}`,
+  },
+  settings: {
+    python: String.raw`import requests
+
+resp = requests.get("http://127.0.0.1:24568/api/settings", timeout=10)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/settings"))
+    .GET()
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const response = await fetch("http://127.0.0.1:24568/api/settings");
+console.log(await response.json());`,
+    typescript: String.raw`type SettingsResponse = {
+  default_output_dir: string | null;
+};
+
+const response = await fetch("http://127.0.0.1:24568/api/settings");
+const data: SettingsResponse = await response.json();
+console.log(data.default_output_dir);`,
+    rust: String.raw`fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let settings: serde_json::Value =
+        reqwest::blocking::get("http://127.0.0.1:24568/api/settings")?.json()?;
+    println!("{:#}", settings);
+    Ok(())
+}`,
+    go: String.raw`resp, err := http.Get("http://127.0.0.1:24568/api/settings")
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  'check-wps': {
+    python: String.raw`import requests
+
+resp = requests.get("http://127.0.0.1:24568/api/check-wps", timeout=10)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/check-wps"))
+    .GET()
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const response = await fetch("http://127.0.0.1:24568/api/check-wps");
+const data = await response.json();
+console.log(data.available, data.version);`,
+    typescript: String.raw`type CheckWpsResponse = {
+  available: boolean;
+  prog_id: string | null;
+  version: string | null;
+  error: string | null;
+};
+
+const response = await fetch("http://127.0.0.1:24568/api/check-wps");
+const data: CheckWpsResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data: serde_json::Value =
+        reqwest::blocking::get("http://127.0.0.1:24568/api/check-wps")?.json()?;
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`resp, err := http.Get("http://127.0.0.1:24568/api/check-wps")
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  'convert-single': {
+    python: String.raw`import requests
+
+url = "http://127.0.0.1:24568/api/convert?async=true"
+with open(r"C:\docs\demo.docx", "rb") as f:
+    resp = requests.post(
+        url,
+        files={"file": ("demo.docx", f, "application/octet-stream")},
+        data={"output_name": "demo.pdf"},
+        timeout=120,
+    )
+
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`import java.io.File;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+OkHttpClient client = new OkHttpClient();
+
+RequestBody body = new MultipartBody.Builder()
+    .setType(MultipartBody.FORM)
+    .addFormDataPart(
+        "file",
+        "demo.docx",
+        RequestBody.create(new File("C:/docs/demo.docx"), MediaType.parse("application/octet-stream"))
+    )
+    .addFormDataPart("output_name", "demo.pdf")
+    .build();
+
+Request request = new Request.Builder()
+    .url("http://127.0.0.1:24568/api/convert?async=true")
+    .post(body)
+    .build();
+
+try (Response response = client.newCall(request).execute()) {
+    System.out.println(response.body().string());
+}`,
+    javascript: String.raw`const fileInput = document.querySelector("#single-file");
+const file = fileInput.files[0];
+if (!file) throw new Error("请选择要上传的文件");
+
+const form = new FormData();
+form.append("file", file, file.name);
+form.append("output_name", "demo.pdf");
+
+// engine 可选: auto / wps / office
+const response = await fetch("http://127.0.0.1:24568/api/convert?async=true&engine=office", {
+  method: "POST",
+  body: form,
+});
+
+console.log(await response.json());`,
+    typescript: String.raw`const fileInput = document.querySelector<HTMLInputElement>("#single-file");
+const file = fileInput?.files?.[0];
+if (!file) throw new Error("请选择要上传的文件");
+
+type ConvertResponse = {
+  success: boolean;
+  task_id?: string | null;
+  output_file?: string | null;
+  message: string;
+};
+
+const form = new FormData();
+form.append("file", file, file.name);
+form.append("output_name", "demo.pdf");
+
+// engine 可选: auto / wps / office
+const response = await fetch("http://127.0.0.1:24568/api/convert?async=true&engine=office", {
+  method: "POST",
+  body: form,
+});
+
+const data: ConvertResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`use reqwest::blocking::{multipart, Client};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let form = multipart::Form::new()
+        .file("file", r"C:\docs\demo.docx")?
+        .text("output_name", "demo.pdf");
+
+    let data: serde_json::Value = Client::new()
+        .post("http://127.0.0.1:24568/api/convert?async=true")
+        .multipart(form)
+        .send()?
+        .json()?;
+
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
+)
+
+func main() {
+	file, err := os.Open("C:/docs/demo.docx")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+
+	part, err := writer.CreateFormFile("file", "demo.docx")
+	if err != nil {
+		panic(err)
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		panic(err)
+	}
+	writer.WriteField("output_name", "demo.pdf")
+	writer.Close()
+
+	req, err := http.NewRequest("POST", "http://127.0.0.1:24568/api/convert?async=true", &body)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	var data map[string]any
+	json.NewDecoder(resp.Body).Decode(&data)
+    fmt.Println(data)
+}`,
+  },
+  'convert-from-url': {
+    python: String.raw`import requests
+
+payload = {
+    "url": "https://example.com/demo.docx",
+    "output_name": "demo.pdf",
+    "output_folder": r"C:\output",
+}
+
+resp = requests.post(
+    "http://127.0.0.1:24568/api/convert-from-url?async=true",
+    json=payload,
+    timeout=120,
+)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`String json = """
+{
+  "url": "https://example.com/demo.docx",
+  "output_name": "demo.pdf",
+  "output_folder": "C:/output"
+}
+""";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/convert-from-url?async=true"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`// engine 可选: auto / wps / office
+const response = await fetch("http://127.0.0.1:24568/api/convert-from-url?async=true&engine=wps", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    url: "https://example.com/demo.docx",
+    output_name: "demo.pdf",
+    output_folder: "C:/output",
+  }),
+});
+
+console.log(await response.json());`,
+    typescript: String.raw`type ConvertResponse = {
+  success: boolean;
+  task_id?: string | null;
+  output_file?: string | null;
+  message: string;
+};
+
+const response = await fetch("http://127.0.0.1:24568/api/convert-from-url?async=true", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    url: "https://example.com/demo.docx",
+    output_name: "demo.pdf",
+    output_folder: "C:/output",
+  }),
+});
+
+const data: ConvertResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`use reqwest::blocking::Client;
+use serde_json::json;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data: serde_json::Value = Client::new()
+        .post("http://127.0.0.1:24568/api/convert-from-url?async=true")
+        .json(&json!({
+            "url": "https://example.com/demo.docx",
+            "output_name": "demo.pdf",
+            "output_folder": r"C:\output"
+        }))
+        .send()?
+        .json()?;
+
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`payload := strings.NewReader(` + "`" + `{"url":"https://example.com/demo.docx","output_name":"demo.pdf","output_folder":"C:/output"}` + "`" + `)
+req, err := http.NewRequest("POST", "http://127.0.0.1:24568/api/convert-from-url?async=true", payload)
+if err != nil {
+	panic(err)
+}
+req.Header.Set("Content-Type", "application/json")
+
+resp, err := http.DefaultClient.Do(req)
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  'convert-batch-from-urls': {
+    python: String.raw`import requests
+
+payload = {
+    "urls": [
+        "https://example.com/a.docx",
+        "https://example.com/b.docx",
+    ],
+    "output_folder": r"C:\output",
+}
+
+resp = requests.post(
+    "http://127.0.0.1:24568/api/convert-batch-from-urls?async=true",
+    json=payload,
+    timeout=300,
+)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`String json = """
+{
+  "urls": [
+    "https://example.com/a.docx",
+    "https://example.com/b.docx"
+  ],
+  "output_folder": "C:/output"
+}
+""";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/convert-batch-from-urls?async=true"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const response = await fetch("http://127.0.0.1:24568/api/convert-batch-from-urls?async=true", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    urls: [
+      "https://example.com/a.docx",
+      "https://example.com/b.docx",
+    ],
+    output_folder: "C:/output",
+  }),
+});
+
+console.log(await response.json());`,
+    typescript: String.raw`type BatchConvertResponse = {
+  success: boolean;
+  task_id?: string | null;
+  total: number;
+  message: string;
+};
+
+const response = await fetch("http://127.0.0.1:24568/api/convert-batch-from-urls?async=true", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    urls: [
+      "https://example.com/a.docx",
+      "https://example.com/b.docx",
+    ],
+    output_folder: "C:/output",
+  }),
+});
+
+const data: BatchConvertResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`use reqwest::blocking::Client;
+use serde_json::json;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data: serde_json::Value = Client::new()
+        .post("http://127.0.0.1:24568/api/convert-batch-from-urls?async=true")
+        .json(&json!({
+            "urls": [
+                "https://example.com/a.docx",
+                "https://example.com/b.docx"
+            ],
+            "output_folder": r"C:\output"
+        }))
+        .send()?
+        .json()?;
+
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`payload := strings.NewReader(` + "`" + `{"urls":["https://example.com/a.docx","https://example.com/b.docx"],"output_folder":"C:/output"}` + "`" + `)
+req, err := http.NewRequest("POST", "http://127.0.0.1:24568/api/convert-batch-from-urls?async=true", payload)
+if err != nil {
+	panic(err)
+}
+req.Header.Set("Content-Type", "application/json")
+
+resp, err := http.DefaultClient.Do(req)
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  'convert-batch': {
+    python: String.raw`import requests
+
+url = "http://127.0.0.1:24568/api/convert-batch?async=true"
+files = [
+    ("files", ("a.docx", open(r"C:\docs\a.docx", "rb"), "application/octet-stream")),
+    ("files", ("b.docx", open(r"C:\docs\b.docx", "rb"), "application/octet-stream")),
+]
+
+try:
+    resp = requests.post(
+        url,
+        files=files,
+        data={"output_folder": r"C:\output"},
+        timeout=300,
+    )
+    resp.raise_for_status()
+    print(resp.json())
+finally:
+    for _, file_info in files:
+        file_info[1].close()`,
+    java: String.raw`OkHttpClient client = new OkHttpClient();
+
+RequestBody body = new MultipartBody.Builder()
+    .setType(MultipartBody.FORM)
+    .addFormDataPart(
+        "files",
+        "a.docx",
+        RequestBody.create(new File("C:/docs/a.docx"), MediaType.parse("application/octet-stream"))
+    )
+    .addFormDataPart(
+        "files",
+        "b.docx",
+        RequestBody.create(new File("C:/docs/b.docx"), MediaType.parse("application/octet-stream"))
+    )
+    .addFormDataPart("output_folder", "C:/output")
+    .build();
+
+Request request = new Request.Builder()
+    .url("http://127.0.0.1:24568/api/convert-batch?async=true")
+    .post(body)
+    .build();
+
+try (Response response = client.newCall(request).execute()) {
+    System.out.println(response.body().string());
+}`,
+    javascript: String.raw`const fileInput = document.querySelector("#batch-files");
+const files = Array.from(fileInput.files || []);
+if (!files.length) throw new Error("请选择要上传的文件");
+
+const form = new FormData();
+for (const file of files) {
+  form.append("files", file, file.name);
+}
+form.append("output_folder", "C:/output");
+
+const response = await fetch("http://127.0.0.1:24568/api/convert-batch?async=true", {
+  method: "POST",
+  body: form,
+});
+
+console.log(await response.json());`,
+    typescript: String.raw`const fileInput = document.querySelector<HTMLInputElement>("#batch-files");
+const files = Array.from(fileInput?.files || []);
+if (!files.length) throw new Error("请选择要上传的文件");
+
+type BatchConvertResponse = {
+  success: boolean;
+  task_id?: string | null;
+  total: number;
+  message: string;
+};
+
+const form = new FormData();
+for (const file of files) {
+  form.append("files", file, file.name);
+}
+form.append("output_folder", "C:/output");
+
+const response = await fetch("http://127.0.0.1:24568/api/convert-batch?async=true", {
+  method: "POST",
+  body: form,
+});
+
+const data: BatchConvertResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`use reqwest::blocking::{multipart, Client};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let form = multipart::Form::new()
+        .file("files", r"C:\docs\a.docx")?
+        .file("files", r"C:\docs\b.docx")?
+        .text("output_folder", r"C:\output");
+
+    let data: serde_json::Value = Client::new()
+        .post("http://127.0.0.1:24568/api/convert-batch?async=true")
+        .multipart(form)
+        .send()?
+        .json()?;
+
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`var body bytes.Buffer
+writer := multipart.NewWriter(&body)
+
+for _, path := range []string{"C:/docs/a.docx", "C:/docs/b.docx"} {
+	file, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+
+	part, err := writer.CreateFormFile("files", filepath.Base(path))
+	if err != nil {
+		panic(err)
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		panic(err)
+	}
+	file.Close()
+}
+
+writer.WriteField("output_folder", "C:/output")
+writer.Close()
+
+req, _ := http.NewRequest("POST", "http://127.0.0.1:24568/api/convert-batch?async=true", &body)
+req.Header.Set("Content-Type", writer.FormDataContentType())
+
+resp, err := http.DefaultClient.Do(req)
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  'task-status': {
+    python: String.raw`import requests
+
+task_id = "550e8400-e29b-41d4-a716-446655440000"
+resp = requests.get(f"http://127.0.0.1:24568/api/status/{task_id}", timeout=10)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`String taskId = "550e8400-e29b-41d4-a716-446655440000";
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/status/" + taskId))
+    .GET()
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const taskId = "550e8400-e29b-41d4-a716-446655440000";
+const response = await fetch("http://127.0.0.1:24568/api/status/" + encodeURIComponent(taskId));
+console.log(await response.json());`,
+    typescript: String.raw`type TaskStatusResponse = {
+  task_id: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  progress: number;
+  current_file?: string | null;
+};
+
+const taskId = "550e8400-e29b-41d4-a716-446655440000";
+const response = await fetch("http://127.0.0.1:24568/api/status/" + encodeURIComponent(taskId));
+const data: TaskStatusResponse = await response.json();
+console.log(data.progress, data.status);`,
+    rust: String.raw`fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let task_id = "550e8400-e29b-41d4-a716-446655440000";
+    let url = format!("http://127.0.0.1:24568/api/status/{}", task_id);
+    let data: serde_json::Value = reqwest::blocking::get(url)?.json()?;
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`taskID := "550e8400-e29b-41d4-a716-446655440000"
+resp, err := http.Get("http://127.0.0.1:24568/api/status/" + url.PathEscape(taskID))
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  preview: {
+    python: String.raw`import requests
+
+pdf_path = r"C:\output\demo.pdf"
+resp = requests.get(
+    "http://127.0.0.1:24568/api/preview",
+    params={"path": pdf_path},
+    timeout=30,
+)
+resp.raise_for_status()
+
+with open("preview-copy.pdf", "wb") as f:
+    f.write(resp.content)`,
+    java: String.raw`String pdfPath = "C:/output/demo.pdf";
+String url = "http://127.0.0.1:24568/api/preview?path=" +
+    java.net.URLEncoder.encode(pdfPath, java.nio.charset.StandardCharsets.UTF_8);
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(url))
+    .GET()
+    .build();
+
+HttpResponse<byte[]> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+java.nio.file.Files.write(java.nio.file.Path.of("preview-copy.pdf"), response.body());`,
+    javascript: String.raw`const pdfPath = "C:/output/demo.pdf";
+const url = "http://127.0.0.1:24568/api/preview?path=" + encodeURIComponent(pdfPath);
+
+const response = await fetch(url);
+const blob = await response.blob();
+const objectUrl = URL.createObjectURL(blob);
+
+const link = document.createElement("a");
+link.href = objectUrl;
+link.download = "preview-copy.pdf";
+link.click();
+
+URL.revokeObjectURL(objectUrl);`,
+    typescript: String.raw`const pdfPath = "C:/output/demo.pdf";
+const response = await fetch(
+  "http://127.0.0.1:24568/api/preview?path=" + encodeURIComponent(pdfPath)
+);
+
+const blob = await response.blob();
+const objectUrl = URL.createObjectURL(blob);
+
+const link = document.createElement("a");
+link.href = objectUrl;
+link.download = "preview-copy.pdf";
+link.click();
+
+URL.revokeObjectURL(objectUrl);`,
+    rust: String.raw`fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let path = r"C:\output\demo.pdf";
+    let client = reqwest::blocking::Client::new();
+    let bytes = client
+        .get("http://127.0.0.1:24568/api/preview")
+        .query(&[("path", path)])
+        .send()?
+        .bytes()?;
+
+    std::fs::write("preview-copy.pdf", &bytes)?;
+    Ok(())
+}`,
+    go: String.raw`pdfPath := "C:/output/demo.pdf"
+requestURL := "http://127.0.0.1:24568/api/preview?path=" + url.QueryEscape(pdfPath)
+
+resp, err := http.Get(requestURL)
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+file, err := os.Create("preview-copy.pdf")
+if err != nil {
+	panic(err)
+}
+defer file.Close()
+
+io.Copy(file, resp.Body)`,
+  },
+  'update-check': {
+    python: String.raw`import requests
+
+resp = requests.get("http://127.0.0.1:24568/api/update/check", timeout=10)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/update/check"))
+    .GET()
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const response = await fetch("http://127.0.0.1:24568/api/update/check");
+console.log(await response.json());`,
+    typescript: String.raw`type UpdateCheckResponse = {
+  success: boolean;
+  current_version: string;
+  latest_version?: string | null;
+  update_available: boolean;
+  download_url?: string | null;
+};
+
+const response = await fetch("http://127.0.0.1:24568/api/update/check");
+const data: UpdateCheckResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data: serde_json::Value =
+        reqwest::blocking::get("http://127.0.0.1:24568/api/update/check")?.json()?;
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`resp, err := http.Get("http://127.0.0.1:24568/api/update/check")
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+  'update-install': {
+    python: String.raw`import requests
+
+payload = {"url": "https://example.com/update.exe"}
+resp = requests.post(
+    "http://127.0.0.1:24568/api/update/install",
+    json=payload,
+    timeout=0,
+)
+resp.raise_for_status()
+print(resp.json())`,
+    java: String.raw`String json = "{\"url\":\"https://example.com/update.exe\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://127.0.0.1:24568/api/update/install"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+    .send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`,
+    javascript: String.raw`const response = await fetch("http://127.0.0.1:24568/api/update/install", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ url: "https://example.com/update.exe" }),
+});
+
+console.log(await response.json());`,
+    typescript: String.raw`type UpdateInstallResponse = {
+  success: boolean;
+  message: string;
+};
+
+const response = await fetch("http://127.0.0.1:24568/api/update/install", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ url: "https://example.com/update.exe" }),
+});
+
+const data: UpdateInstallResponse = await response.json();
+console.log(data);`,
+    rust: String.raw`use reqwest::blocking::Client;
+use serde_json::json;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let data: serde_json::Value = Client::new()
+        .post("http://127.0.0.1:24568/api/update/install")
+        .json(&json!({ "url": "https://example.com/update.exe" }))
+        .send()?
+        .json()?;
+
+    println!("{:#}", data);
+    Ok(())
+}`,
+    go: String.raw`payload := strings.NewReader(` + "`" + `{"url":"https://example.com/update.exe"}` + "`" + `)
+req, err := http.NewRequest("POST", "http://127.0.0.1:24568/api/update/install", payload)
+if err != nil {
+	panic(err)
+}
+req.Header.Set("Content-Type", "application/json")
+
+resp, err := http.DefaultClient.Do(req)
+if err != nil {
+	panic(err)
+}
+defer resp.Body.Close()
+
+var data map[string]any
+json.NewDecoder(resp.Body).Decode(&data)
+fmt.Println(data)`,
+  },
+};
+
+function renderApiExamples() {
+  document.querySelectorAll('.api-examples').forEach((container) => {
+    const exampleKey = container.dataset.exampleKey;
+    const examples = API_EXAMPLES[exampleKey];
+    if (!examples) return;
+
+    const title = document.createElement('div');
+    title.className = 'api-examples-title';
+    title.textContent = '多语言调用示例';
+
+    const tabs = document.createElement('div');
+    tabs.className = 'code-tabs';
+
+    const panels = document.createElement('div');
+    const tabButtons = [];
+    const codePanels = [];
+
+    CODE_LANGS.forEach(([langKey, langLabel]) => {
+      const snippet = examples[langKey];
+      if (!snippet) return;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'code-tab';
+      btn.textContent = langLabel;
+
+      const panel = document.createElement('pre');
+      panel.className = 'api-code code-panel';
+      panel.textContent = snippet;
+
+      btn.addEventListener('click', () => {
+        tabButtons.forEach((item) => item.classList.remove('active'));
+        codePanels.forEach((item) => item.classList.remove('active'));
+        btn.classList.add('active');
+        panel.classList.add('active');
+      });
+
+      tabButtons.push(btn);
+      codePanels.push(panel);
+      tabs.appendChild(btn);
+      panels.appendChild(panel);
+    });
+
+    if (tabButtons.length) {
+      tabButtons[0].classList.add('active');
+      codePanels[0].classList.add('active');
+    }
+
+    container.replaceChildren(title, tabs, panels);
+  });
+}
+
+// ===== Tab 切换 =====
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelector(`.tab[onclick="switchTab('${name}')"]`).classList.add('active');
+}
+
+// ===== 工具函数 =====
+async function apiGet(path) {
+  const res = await fetch(BASE + path);
+  return res.json();
+}
+
+async function apiPost(path, body) {
+  const res = await fetch(BASE + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+function showJson(el, data) {
+  el.style.display = 'block';
+  el.textContent = JSON.stringify(data, null, 2);
+}
+
+function formatSize(bytes) {
+  if (!bytes) return '-';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+// ===== 接口文档折叠 =====
+function toggleDetail(btn) {
+  const detail = btn.nextElementSibling;
+  detail.classList.toggle('open');
+  btn.textContent = detail.classList.contains('open') ? '收起详情 ▲' : '查看详情 ▼';
+}
+
+// ===== 服务状态 =====
+async function loadHealth() {
+  try {
+    const data = await apiGet('/health');
+    document.getElementById('st-status').textContent = data.status || 'error';
+    document.getElementById('st-status').className = 'value ' + (data.status === 'ok' ? 'ok' : 'err');
+    document.getElementById('st-version').textContent = data.version || '-';
+    document.getElementById('st-wps').textContent = data.wps_available ? '可用' : '不可用';
+    document.getElementById('st-wps').className = 'value ' + (data.wps_available ? 'ok' : 'err');
+    document.getElementById('st-progid').textContent = data.wps_prog_id || '-';
+    showJson(document.getElementById('status-raw'), data);
+  } catch (e) {
+    document.getElementById('st-status').textContent = '连接失败';
+    document.getElementById('st-status').className = 'value err';
+    showJson(document.getElementById('status-raw'), { error: e.message });
+  }
+}
+
+async function loadWps() {
+  try {
+    const data = await apiGet('/api/check-wps');
+    document.getElementById('st-wps').textContent = data.available ? '可用' : '不可用';
+    document.getElementById('st-wps').className = 'value ' + (data.available ? 'ok' : 'err');
+    document.getElementById('st-progid').textContent = data.prog_id || '-';
+    document.getElementById('st-wps-ver').textContent = data.version || '-';
+    showJson(document.getElementById('status-raw'), data);
+  } catch (e) {
+    showJson(document.getElementById('status-raw'), { error: e.message });
+  }
+}
+
+async function loadSettings() {
+  try {
+    const data = await apiGet('/api/settings');
+    document.getElementById('st-output').textContent = data.default_output_dir || '未设置';
+    showJson(document.getElementById('status-raw'), data);
+  } catch (e) {
+    showJson(document.getElementById('status-raw'), { error: e.message });
+  }
+}
+
+async function loadUpdate() {
+  try {
+    const data = await apiGet('/api/update/check');
+    showJson(document.getElementById('status-raw'), data);
+  } catch (e) {
+    showJson(document.getElementById('status-raw'), { error: e.message });
+  }
+}
+
+// ===== 单文件转换 =====
+async function convertSingle() {
+  const fileInput = document.getElementById('single-file');
+  const file = fileInput.files[0];
+  const remoteUrl = document.getElementById('single-url').value.trim();
+  const outputName = document.getElementById('single-output-name').value.trim();
+  const isAsync = document.getElementById('single-async').checked;
+  if (!file && !remoteUrl) {
+    alert('请选择文件或填写文档下载链接');
+    return;
+  }
+
+  const btn = document.getElementById('btn-convert-single');
+  btn.disabled = true;
+  btn.textContent = '转换中...';
+
+  try {
+    let res;
+    if (remoteUrl) {
+      res = await fetch(BASE + '/api/convert-from-url' + (isAsync ? '?async=true' : ''), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: remoteUrl,
+          output_name: outputName || undefined,
+        }),
+      });
+    } else {
+      const form = new FormData();
+      form.append('file', file);
+      if (outputName) form.append('output_name', outputName);
+      res = await fetch(BASE + '/api/convert' + (isAsync ? '?async=true' : ''), {
+        method: 'POST',
+        body: form,
+      });
+    }
+    const data = await res.json();
+    lastSingleResult = data;
+    showJson(document.getElementById('single-result'), data);
+
+    const actions = document.getElementById('single-preview-actions');
+    actions.style.display = 'flex';
+    actions.style.gap = '8px';
+  } catch (e) {
+    showJson(document.getElementById('single-result'), { error: e.message });
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '开始转换';
+  }
+}
+
+function previewFromSingle() {
+  if (!lastSingleResult) return;
+  const path = lastSingleResult.output_file;
+  if (!path) {
+    alert('没有可预览的文件（可能使用了异步模式，请先查询任务状态）');
+    return;
+  }
+  document.getElementById('preview-path').value = path;
+  switchTab('preview');
+  previewPdf();
+}
+
+function pollFromSingle() {
+  if (!lastSingleResult || !lastSingleResult.task_id) {
+    alert('没有 task_id');
+    return;
+  }
+  document.getElementById('task-id-input').value = lastSingleResult.task_id;
+  switchTab('task');
+  queryTask();
+}
+
+// ===== 批量转换 =====
+async function convertBatch() {
+  const fileInput = document.getElementById('batch-files');
+  const files = fileInput.files;
+  const batchUrls = document.getElementById('batch-urls').value
+    .split(/\r?\n/)
+    .map(item => item.trim())
+    .filter(Boolean);
+  const outputFolder = document.getElementById('batch-output-folder').value.trim();
+  const isAsync = document.getElementById('batch-async').checked;
+  if (!files.length && !batchUrls.length) {
+    alert('请选择文件或填写文档下载链接');
+    return;
+  }
+
+  const btn = document.getElementById('btn-convert-batch');
+  btn.disabled = true;
+  btn.textContent = '转换中...';
+
+  try {
+    let res;
+    if (batchUrls.length) {
+      res = await fetch(BASE + '/api/convert-batch-from-urls' + (isAsync ? '?async=true' : ''), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          urls: batchUrls,
+          output_folder: outputFolder || undefined,
+        }),
+      });
+    } else {
+      const form = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        form.append('files', files[i]);
+      }
+      if (outputFolder) form.append('output_folder', outputFolder);
+      res = await fetch(BASE + '/api/convert-batch' + (isAsync ? '?async=true' : ''), {
+        method: 'POST',
+        body: form,
+      });
+    }
+    const data = await res.json();
+    showJson(document.getElementById('batch-result'), data);
+    renderFileResults('batch-file-results', data.results, data.task_id);
+  } catch (e) {
+    showJson(document.getElementById('batch-result'), { error: e.message });
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '开始批量转换';
+  }
+}
+
+function renderFileResults(containerId, results, taskId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  if (taskId && (!results || !results.length)) {
+    const div = document.createElement('div');
+    div.style.cssText = 'margin-top:8px;';
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline btn-sm';
+    btn.textContent = '查询任务状态';
+    btn.onclick = () => {
+      document.getElementById('task-id-input').value = taskId;
+      switchTab('task');
+      queryTask();
+    };
+    div.appendChild(btn);
+    container.appendChild(div);
+    return;
+  }
+
+  if (!results || !results.length) return;
+
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'file-result';
+    div.innerHTML = `
+      <div>
+        <div class="name">${escapeHtml(r.file)}</div>
+        <div style="font-size:12px; color:var(--text-muted);">
+          ${r.size ? formatSize(r.size) : ''} ${r.duration_ms ? '· ' + r.duration_ms + 'ms' : ''}
+          ${r.error ? '· <span style="color:var(--danger)">' + escapeHtml(r.error) + '</span>' : ''}
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="status-badge ${r.status === 'success' ? 'success' : 'failed'}">${r.status === 'success' ? '成功' : '失败'}</span>
+        ${r.output ? '<button class="btn btn-success btn-sm">预览</button>' : ''}
+      </div>
+    `;
+    const previewButton = div.querySelector("button");
+    if (previewButton) previewButton.addEventListener("click", () => openPreview(r.output));
+    container.appendChild(div);
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+
+
+function openPreview(path) {
+  document.getElementById('preview-path').value = path;
+  switchTab('preview');
+  previewPdf();
+}
+
+// ===== 任务查询 =====
+async function queryTask() {
+  const taskId = document.getElementById('task-id-input').value.trim();
+  if (!taskId) { alert('请输入 Task ID'); return; }
+
+  try {
+    const data = await apiGet('/api/status/' + encodeURIComponent(taskId));
+    showJson(document.getElementById('task-result'), data);
+
+    const progressArea = document.getElementById('task-progress');
+    progressArea.style.display = 'block';
+    document.getElementById('task-progress-pct').textContent = data.progress + '%';
+    document.getElementById('task-progress-bar').style.width = data.progress + '%';
+    document.getElementById('task-progress-label').textContent =
+      data.current_file ? '当前: ' + data.current_file : data.status;
+
+    renderFileResults('task-file-results', data.results, null);
+
+    const autoPoll = document.getElementById('task-auto-poll').checked;
+    if (autoPoll && (data.status === 'pending' || data.status === 'processing')) {
+      stopPolling();
+      pollTimer = setInterval(() => queryTask(), 1000);
+    } else {
+      stopPolling();
+    }
+  } catch (e) {
+    showJson(document.getElementById('task-result'), { error: e.message });
+    stopPolling();
+  }
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+}
+
+// ===== PDF 预览 =====
+function previewPdf() {
+  const path = document.getElementById('preview-path').value.trim();
+  if (!path) { alert('请输入 PDF 文件路径'); return; }
+
+  const container = document.getElementById('preview-container');
+  const url = BASE + '/api/preview?path=' + encodeURIComponent(path);
+
+  const frame = document.createElement("iframe");
+  frame.className = "preview-frame";
+  frame.src = url;
+  container.replaceChildren(frame);
+}
+
+// ===== 页面加载 =====
+renderApiExamples();
+loadHealth();
+</script>
+</body>
+</html>

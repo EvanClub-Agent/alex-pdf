@@ -1,0 +1,59 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
+*.key.pub
+*.keystore
+*.jks
+
+# Local tooling and project notes
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+.claude/
+.codex/
+/CLAUDE.md
+/需求.md
+/docs/优化.md
+
+# npm is the package manager used by the Tauri build
+node_modules/
+/dist/
+/pnpm-lock.yaml
+*.tsbuildinfo
+*.log
+
+# Tauri / Rust build output
+target/
+/src-tauri/gen/schemas/
+**/*.rs.bk
+*.exe
+*.msi
+*.nsis.zip
+*.part
+
+# Local data
+*.sqlite
+*.sqlite-*
+*.db
+*.db-wal
+*.db-shm
+desktop_settings.json
+history.jsonl
+history.jsonl.imported
+default_output_dir.txt
+pending-install.json
+
+# Locally generated conversion samples and output
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.pdf

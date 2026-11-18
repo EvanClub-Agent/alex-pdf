@@ -1,0 +1,6 @@
+{
+  "identifier": "default",
+  "description": "Default capability for dialog/shell access",
+  "windows": ["*"],
+  "permissions": ["core:default", "dialog:allow-open", "shell:allow-open"]
+}

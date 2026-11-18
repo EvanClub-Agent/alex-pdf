@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.tauri.app/config/2.0.0",
+  "productName": "AlexPDF",
+  "version": "1.0.0",
+  "identifier": "com.wordtopdf.converter",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "AlexPDF",
+        "width": 1140,
+        "height": 760,
+        "minWidth": 860,
+        "minHeight": 600,
+        "resizable": true,
+        "minimizable": true,
+        "maximizable": true,
+        "center": true,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ipc: http://ipc.localhost https://ipc.localhost http://127.0.0.1:24568; frame-src http://127.0.0.1:24568; object-src 'none'; base-uri 'none'",
+      "devCsp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ipc: http://ipc.localhost https://ipc.localhost ws://localhost:5173 http://127.0.0.1:24568; frame-src http://127.0.0.1:24568; object-src 'none'; base-uri 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "publisher": "量子跃动",
+    "license": "MIT",
+    "licenseFile": "../LICENSE",
+    "targets": ["nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerHooks": "installer-hooks.nsh",
+        "displayLanguageSelector": false,
+        "languages": ["SimpChinese"]
+      }
+    }
+  },
+  "plugins": {}
+}
