@@ -1,21 +1,44 @@
+<div align="center">
+
+<img src="src-tauri/icons/128x128.png" width="64" alt="AlexPDF icon" />
+
 # AlexPDF
 
-[简体中文](README.md)
+**Convert Word documents and Excel workbooks to PDF on Windows.**
 
-A Tauri 2.x desktop app that converts .doc/.docx/.xls/.xlsx to PDF via Windows COM automation with WPS Office or Microsoft Office. Pure Rust backend, no Python/Node runtime required.
+AlexPDF exports through your installed copy of WPS Office or Microsoft Office. Drop in local files, paste direct download links, or submit a job from a script through the local HTTP API.
+
+[![MIT license](https://img.shields.io/badge/license-MIT-215780)](LICENSE)
+[![Windows build status](https://github.com/EvanClub-Agent/alex-pdf/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/EvanClub-Agent/alex-pdf/actions/workflows/windows.yml)
+[![Windows 10 and 11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-2559A4)](#requirements)
+
+[简体中文](README.md) · **English**
+
+[Quick start](#quick-start) · [HTTP API](#api) · [Contributing](CONTRIBUTING.md) · [Repository labels](docs/repository-labels.md)
+
+[![AlexPDF workbench in Chinese, showing local files, single links, batch links, and the drop zone for Word and Excel documents.](docs/assets/alexpdf-workbench.png)](docs/assets/alexpdf-workbench.png)
+
+</div>
 
 ## Highlights
 
-- Pure Rust + windows-rs COM automation
+- Tauri 2 desktop app with a Rust backend and windows-rs COM automation. The packaged desktop app runs without Node.js or Python.
 - Local HTTP API for UI or scripting
 - Single and batch conversion (Word/Excel)
-- Progress polling via `/api/status`
+- Progress polling via `/api/status/{task_id}`
 - Configurable PDF output folder
 
 ## Requirements
 
 - Windows 10/11 (64-bit)
 - A COM-enabled WPS Office installation or Microsoft Word / Excel
+
+## Quick start
+
+1. Build and launch the desktop app on Windows using the commands below. Users with an installer only need the app and the corresponding Office engine.
+2. Open **系统诊断** (Diagnostics) to check engine availability. Word files need a word processor and Excel files need a spreadsheet engine.
+3. In **本地文档转换** (Local files), drop in a `.docx` or `.xlsx` file, pick an output folder, and click **开始转换** (Convert). Submit Word and Excel as separate batches.
+4. For remote documents, choose single-link mode or paste one direct download URL per line in batch-link mode.
 
 ## Development
 
@@ -106,6 +129,10 @@ GET /api/status/{task_id}
 ## Updates
 
 The client checks for updates when `PDF_CONVERTER_UPDATE_URL` points to a release manifest. Use HTTPS for remote deployments or HTTP on loopback for local testing. The client verifies the installer against the SHA-256 in that manifest. See the [update server guide](update-server/README.md).
+
+## Community
+
+For setup and checks before opening a pull request, see the [contribution guide](CONTRIBUTING.md). For repository maintenance, see the [label guide](docs/repository-labels.md) and [changelog](CHANGELOG.md). Community participation follows the [code of conduct](CODE_OF_CONDUCT.md). Report security issues privately using the [security policy](SECURITY.md).
 
 ## License
 

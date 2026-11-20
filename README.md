@@ -1,21 +1,44 @@
+<div align="center">
+
+<img src="src-tauri/icons/128x128.png" width="64" alt="AlexPDF 图标" />
+
 # AlexPDF
 
-[English](README.en.md)
+**在 Windows 上，把 Word 和 Excel 批量转为 PDF。**
 
-基于 Tauri 2.x 的桌面应用，通过 Windows COM 接口调用 WPS Office 或 Microsoft Office，实现 .doc/.docx/.xls/.xlsx 批量转 PDF。无 Python/Node 运行时依赖，安装即用。
+使用本机安装的 WPS Office 或 Microsoft Office 排版导出。可以拖入文件、粘贴文档直链，也可以从脚本调用本机 HTTP API。
+
+[![MIT 许可证](https://img.shields.io/badge/license-MIT-215780)](LICENSE)
+[![Windows 构建状态](https://github.com/EvanClub-Agent/alex-pdf/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/EvanClub-Agent/alex-pdf/actions/workflows/windows.yml)
+[![支持 Windows 10 和 11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-2559A4)](#系统要求)
+
+**简体中文** · [English](README.en.md)
+
+[快速上手](#快速上手) · [API 文档](#api-文档) · [参与贡献](CONTRIBUTING.md) · [仓库标签规范](docs/repository-labels.md)
+
+[![AlexPDF 主界面：左侧切换本地文档、单条链接与批量链接，中央可拖入 Word 或 Excel 并选择 PDF 输出目录。](docs/assets/alexpdf-workbench.png)](docs/assets/alexpdf-workbench.png)
+
+</div>
 
 ## 亮点
 
-- 纯 Rust + windows-rs COM 调用
+- Tauri 2 桌面应用，Rust 后端通过 windows-rs 调用 COM，安装后的桌面端无需 Node.js 或 Python
 - 本地 HTTP API，前端/脚本均可调用
 - 支持单文件/批量转换（Word/Excel）
-- 进度查询（轮询 /api/status）
+- 通过 `/api/status/{task_id}` 按任务查询转换进度
 - 支持在安装时或转换时指定 PDF 输出目录
 
 ## 系统要求
 
 - Windows 10/11 (64 位)
 - 已安装可提供 COM 接口的 WPS Office，或 Microsoft Word / Excel
+
+## 快速上手
+
+1. 在 Windows 上按下方「开发与运行」构建并启动 AlexPDF。使用安装包的用户只需安装应用及对应的 Office 引擎。
+2. 打开「系统诊断」查看转换引擎。转换 Word 文档需要文字处理组件，转换 Excel 表格需要电子表格组件。
+3. 回到「本地文档转换」，拖入一份 `.docx` 或 `.xlsx` 文件，选择输出目录后点击「开始转换」。批量处理时将 Word 和 Excel 分开提交。
+4. 文档来自下载地址时，选择「单条链接转换」；处理多条直链时，在「批量链接转换」中每行粘贴一条。
 
 ## 开发与运行
 
@@ -44,7 +67,7 @@ npm run tauri build
 | `src-tauri/Cargo.toml` | `[package].version` | Rust 端 `env!("CARGO_PKG_VERSION")`，决定客户端检查更新比对结果 |
 | `src-tauri/tauri.conf.json` | `version` | NSIS 安装包元数据（控制面板里显示的版本） |
 
-不同步会导致：客户端检查更新时上报版本与控制面板显示版本不一致，用户永远收不到推送。
+三个版本号应保持一致，以便客户端检查更新时使用的版本与安装包显示的版本相符。
 
 ### 一键改版本号
 
@@ -79,7 +102,7 @@ npm run release
 
 1. **改版本号**：`npm run bump <version|patch|minor|major>`
 2. **打包**（Windows 上）：`npm run tauri build`
-3. **分发**：安装包可以上传至 GitHub Releases。使用自托管更新服务时，在服务的 `/admin` 上传安装包并检查 `/update.json` 中的版本和 SHA-256。
+3. **分发**：发布 GitHub Release 时，按[仓库标签规范](docs/repository-labels.md)为已验证的提交创建版本标签并附上安装包。使用自托管更新服务时，在服务的 `/admin` 上传安装包并检查 `/update.json` 中的版本和 SHA-256。
 4. **检查更新**：启动客户端前设置 `PDF_CONVERTER_UPDATE_URL`。清单和安装包的远程地址使用 HTTPS，本机测试可使用 `http://127.0.0.1:8800/update.json`。留空时桌面转换仍可使用，客户端不访问更新服务器。
 
 部署参数和下载日志说明见 [更新服务文档](update-server/README.md)。
@@ -117,10 +140,12 @@ GET /api/check-wps
 {
   "available": true,
   "prog_id": "KWPS.Application",
-  "version": "11.1.0.00000",
+  "version": null,
   "error": null
 }
 ```
+
+如需查询引擎版本，可调用 `GET /api/engine-version?engine=wps`。
 
 ### 3) 单文件转换
 
@@ -249,6 +274,10 @@ scripts/            API 测试脚本
 
 - 仅支持 Windows 平台（依赖 Office 或 WPS 的 COM 接口）
 - 个人免费版 WPS 可能不包含 COM 接口能力
+
+## 社区
+
+贡献代码或文档请阅读[贡献指南](CONTRIBUTING.md)和[行为准则](CODE_OF_CONDUCT.md)。版本变更见[变更记录](CHANGELOG.md)，安全问题请按[安全策略](SECURITY.md)私下反馈。
 
 ## 许可证
 

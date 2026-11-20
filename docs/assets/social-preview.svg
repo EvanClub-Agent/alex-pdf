@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc" xml:lang="zh-CN">
+  <title id="title">AlexPDF · Word 和 Excel 本地转 PDF</title>
+  <desc id="desc">Windows 桌面转换工具，以本机 WPS Office 或 Microsoft Office 将 DOC、DOCX、XLS、XLSX 文件导出为 PDF。</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#aec5df"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="640" fill="#f8faff"/>
+  <path d="M704 0h576v640H704z" fill="#ebf2fb"/>
+  <path d="M704 0h576v640H704z" fill="url(#grid)"/>
+  <g font-family="Helvetica Neue, Arial, PingFang SC, Microsoft YaHei, sans-serif">
+    <g transform="translate(64 62)">
+      <rect width="44" height="44" rx="10" fill="#174b76"/>
+      <path d="M12 9h15l6 6v20H12z M26 9v8h7 M17 23h11 M17 28h8" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+      <text x="58" y="34" font-size="32" font-weight="700" fill="#17314d">AlexPDF</text>
+    </g>
+    <text x="62" y="269" font-size="76" font-weight="700" letter-spacing="-2.4" fill="#142f4b">Word 和 Excel</text>
+    <text x="62" y="366" font-size="83" font-weight="700" letter-spacing="-2.4" fill="#265db4">本地转 PDF</text>
+    <text x="68" y="438" font-size="25" fill="#465e78">用本机 WPS Office 或 Microsoft Office 导出</text>
+    <path d="M68 518h560" stroke="#c7d5e5"/>
+    <text x="68" y="562" font-size="21" font-weight="600" fill="#254a6e">Windows 10 / 11</text>
+    <circle cx="249" cy="555" r="2.5" fill="#849bb3"/>
+    <text x="269" y="562" font-size="21" fill="#47617b">本地文件 · 文档直链 · 批量转换</text>
+    <g fill="none" stroke="#769bbd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M925 217h31q13 0 13 13v77q0 13 13 13h38"/>
+      <path d="M925 423h31q13 0 13-13v-77q0-13 13-13"/>
+      <path d="m1011 311 10 9-10 9"/>
+    </g>
+    <g transform="translate(766 147)">
+      <rect width="156" height="140" rx="16" fill="#fff" stroke="#bacee3" stroke-width="2"/>
+      <path d="M27 30h27 M27 39h45 M27 48h35" stroke="#7c9dc4" stroke-width="3.5" stroke-linecap="round"/>
+      <text x="24" y="87" font-size="30" font-weight="700" fill="#2a5390">Word</text>
+      <text x="25" y="113" font-size="16" fill="#576b83">.doc / .docx</text>
+    </g>
+    <g transform="translate(766 353)">
+      <rect width="156" height="140" rx="16" fill="#fff" stroke="#bacee3" stroke-width="2"/>
+      <path d="M27 26h41v24H27z M27 36h41 M42 26v24" stroke="#7aa394" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <text x="24" y="87" font-size="30" font-weight="700" fill="#24745a">Excel</text>
+      <text x="25" y="113" font-size="16" fill="#576b83">.xls / .xlsx</text>
+    </g>
+    <g transform="translate(1040 209)">
+      <path d="M12 0h108l57 57v150a13 13 0 0 1-13 13H12a12 12 0 0 1-12-12V12A12 12 0 0 1 12 0z" fill="#204f80"/>
+      <path d="M120 0v45a12 12 0 0 0 12 12h45" fill="#729ec9"/>
+      <text x="21" y="143" fill="#fff" font-size="58" font-weight="700" letter-spacing="-2">PDF</text>
+      <path d="M24 170h112 M24 184h75" stroke="#8ab0d2" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
