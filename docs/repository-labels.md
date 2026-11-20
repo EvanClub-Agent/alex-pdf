@@ -60,7 +60,7 @@ GitHub 每仓库最多允许 20 个 Topics，每个最长 50 个字符，仅使�
 
 1. 使用 `npm run bump -- <版本号>` 同步 [package.json](../package.json)、[Cargo.toml](../src-tauri/Cargo.toml)、[tauri.conf.json](../src-tauri/tauri.conf.json) 及两个锁文件。更新[变更记录](../CHANGELOG.md)。
 2. 确认目标提交通过 Windows 测试和 NSIS 打包，用该提交构建的安装包验证转换。
-3. 在该提交上创建带注释的 Git 标签。GitHub Release 使用同一标签并附上对应的 Windows 安装包。仓库现有 [Windows 工作流](../.github/workflows/windows.yml) 负责测试和打包，Release 由维护者发布。
+3. 在该提交上创建带注释的 Git 标签。GitHub Release 使用同一标签并附上对应的 Windows 安装包。从该提交的 [Windows 工作流](../.github/workflows/windows.yml) 下载 `AlexPDF-Windows-x64` 构建产物，解压后将 `AlexPDF-Windows-x64-setup.exe` 原样附到 Release。这个固定文件名供两份 README 的最新版直链使用。
 4. 使用自托管更新服务时，再核对清单中的版本号、下载地址和 SHA-256。[更新服务文档](../update-server/README.md)
 
 ## 开源仓库交付清单

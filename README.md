@@ -14,6 +14,8 @@
 
 **简体中文** · [English](README.en.md)
 
+**[下载 Windows x64 安装包](https://github.com/EvanClub-Agent/alex-pdf/releases/latest/download/AlexPDF-Windows-x64-setup.exe)** · [发布说明](https://github.com/EvanClub-Agent/alex-pdf/releases/latest)
+
 [快速上手](#快速上手) · [API 文档](#api-文档) · [参与贡献](CONTRIBUTING.md) · [仓库标签规范](docs/repository-labels.md)
 
 [![AlexPDF 主界面：左侧切换本地文档、单条链接与批量链接，中央可拖入 Word 或 Excel 并选择 PDF 输出目录。](docs/assets/alexpdf-workbench.png)](docs/assets/alexpdf-workbench.png)
@@ -35,7 +37,7 @@
 
 ## 快速上手
 
-1. 在 Windows 上按下方「开发与运行」构建并启动 AlexPDF。使用安装包的用户只需安装应用及对应的 Office 引擎。
+1. 下载并运行 [AlexPDF Windows x64 安装包](https://github.com/EvanClub-Agent/alex-pdf/releases/latest/download/AlexPDF-Windows-x64-setup.exe)，按提示安装并启动应用。
 2. 打开「系统诊断」查看转换引擎。转换 Word 文档需要文字处理组件，转换 Excel 表格需要电子表格组件。
 3. 回到「本地文档转换」，拖入一份 `.docx` 或 `.xlsx` 文件，选择输出目录后点击「开始转换」。批量处理时将 Word 和 Excel 分开提交。
 4. 文档来自下载地址时，选择「单条链接转换」；处理多条直链时，在「批量链接转换」中每行粘贴一条。

@@ -14,6 +14,8 @@ AlexPDF exports through your installed copy of WPS Office or Microsoft Office. D
 
 [简体中文](README.md) · **English**
 
+**[Download the Windows x64 installer](https://github.com/EvanClub-Agent/alex-pdf/releases/latest/download/AlexPDF-Windows-x64-setup.exe)** · [Release notes](https://github.com/EvanClub-Agent/alex-pdf/releases/latest)
+
 [Quick start](#quick-start) · [HTTP API](#api) · [Contributing](CONTRIBUTING.md) · [Repository labels](docs/repository-labels.md)
 
 [![AlexPDF workbench in Chinese, showing local files, single links, batch links, and the drop zone for Word and Excel documents.](docs/assets/alexpdf-workbench.png)](docs/assets/alexpdf-workbench.png)
@@ -35,7 +37,7 @@ AlexPDF exports through your installed copy of WPS Office or Microsoft Office. D
 
 ## Quick start
 
-1. Build and launch the desktop app on Windows using the commands below. Users with an installer only need the app and the corresponding Office engine.
+1. Download and run the [Windows x64 installer](https://github.com/EvanClub-Agent/alex-pdf/releases/latest/download/AlexPDF-Windows-x64-setup.exe), then launch AlexPDF.
 2. Open **系统诊断** (Diagnostics) to check engine availability. Word files need a word processor and Excel files need a spreadsheet engine.
 3. In **本地文档转换** (Local files), drop in a `.docx` or `.xlsx` file, pick an output folder, and click **开始转换** (Convert). Submit Word and Excel as separate batches.
 4. For remote documents, choose single-link mode or paste one direct download URL per line in batch-link mode.
